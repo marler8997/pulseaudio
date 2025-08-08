@@ -1,6 +1,9 @@
 #!/bin/sh
+
+echo git-version-gen: running with "$#" args: "$@" >&2
+
 # Print a version string.
-scriptversion=2012-09-25.20
+scriptversion=2025-08-07.19
 
 # Copyright (C) 2007-2008 Free Software Foundation
 #
@@ -77,10 +80,14 @@ nl='
 '
 v=
 
+echo git-version-gen: tarball_version_file=$tarball_version_file >&2
+
+
 # First see if there is a tarball-only version file.
 # then try "git describe", then default.
 if test -f $tarball_version_file
 then
+    echo git-version-gen: tarball_version_file exists >&2
     v=`cat $tarball_version_file` || exit 1
     case $v in
 	*$nl*) v= ;; # reject multi-line output
@@ -92,6 +99,8 @@ then
     esac
     test -z "$v" \
 	&& echo "$0: WARNING: $tarball_version_file seems to be damaged" 1>&2
+else
+    echo git-version-gen: tarball_version_file does NOT exist >&2
 fi
 
 # This is presently used by the GNOME-OSTree build system; it
@@ -100,7 +109,10 @@ fi
 # because we're inside a chroot.
 if test -n "$GIT_DESCRIBE_FOR_BUILD";
 then
+    echo git-version-gen: git describe: $GIT_DESCRIBE_FOR_BUILD >&2
     v=$GIT_DESCRIBE_FOR_BUILD
+else
+    echo git-version-gen: no git describe >&2
 fi
 
 if test -n "$v"
@@ -146,11 +158,13 @@ else
     echo 1>&2 "$0: Failed to determine git revision"
     exit 1
 fi
+echo git-version-gen: here >&2
 
 v=`echo "$v" |sed 's/^v//'`
 
 # Don't declare a version "dirty" merely because a time stamp has changed.
 git status > /dev/null 2>&1
+echo git-version-gen: here2 >&2
 
 dirty=`sh -c 'git diff-index --name-only HEAD' 2>/dev/null` || dirty=
 case "$dirty" in
@@ -161,6 +175,7 @@ case "$dirty" in
 	  *) v="$v-dirty" ;;
 	esac ;;
 esac
+echo git-version-gen: here3 >&2
 
 # Omit the trailing newline, so that m4_esyscmd can use the result directly.
 echo "$v" | tr -d '\012'

@@ -3,6 +3,7 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+    const sanitize_c = b.option(bool, "sanitize", "set sanitize_c") orelse false;
     const t = target.result;
 
     const lib = b.addStaticLibrary(.{
@@ -10,6 +11,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    lib.root_module.sanitize_c = sanitize_c;
     lib.linkLibC();
     lib.addIncludePath(b.path("src"));
 

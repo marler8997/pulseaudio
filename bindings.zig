@@ -547,8 +547,10 @@ pub const stream = opaque {
         return unwrapError(pa_stream_connect_playback(s, dev, attr, flags, volume, sync_stream));
     }
     extern fn pa_stream_connect_playback(s: *stream, dev: ?[*:0]const u8, attr: ?*const buffer_attr, flags: flags_t, volume: ?*const cvolume, sync_stream: ?*stream) c_int;
-    pub const connect_record = pa_stream_connect_record;
-    extern fn pa_stream_connect_record(s: *stream, dev: [*:0]const u8, attr: ?*const buffer_attr, flags: flags_t) c_int;
+    pub fn connect_record(s: *stream, dev: ?[*:0]const u8, attr: ?*const buffer_attr, flags: flags_t) Error!void {
+        return unwrapError(pa_stream_connect_record(s, dev, attr, flags));
+    }
+    extern fn pa_stream_connect_record(s: *stream, dev: ?[*:0]const u8, attr: ?*const buffer_attr, flags: flags_t) c_int;
     pub const disconnect = pa_stream_disconnect;
     extern fn pa_stream_disconnect(s: *stream) c_int;
     pub fn begin_write(p: *stream, data: *?*anyopaque, nbytes: *usize) Error!void {

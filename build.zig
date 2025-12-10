@@ -6,10 +6,13 @@ pub fn build(b: *std.Build) void {
     const sanitize_c = b.option(bool, "sanitize", "set sanitize_c") orelse false;
     const t = target.result;
 
-    const lib = b.addStaticLibrary(.{
+    const lib = b.addLibrary(.{
+        .linkage = .static,
         .name = "pulse",
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+        }),
     });
     lib.root_module.sanitize_c = sanitize_c;
     lib.linkLibC();

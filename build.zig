@@ -3,7 +3,7 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
-    const sanitize_c = b.option(bool, "sanitize", "set sanitize_c") orelse false;
+    const sanitize_c = b.option(std.zig.SanitizeC, "sanitize", "set sanitize_c") orelse .off;
     const t = target.result;
 
     const lib = b.addLibrary(.{
@@ -12,9 +12,9 @@ pub fn build(b: *std.Build) void {
         .root_module = b.createModule(.{
             .target = target,
             .optimize = optimize,
+            .sanitize_c = sanitize_c,
         }),
     });
-    lib.root_module.sanitize_c = sanitize_c;
     lib.linkLibC();
     lib.addIncludePath(b.path("src"));
 

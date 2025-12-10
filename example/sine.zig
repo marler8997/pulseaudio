@@ -27,8 +27,16 @@ fn nextSample(sine_phase_ref: *f32, sample_rate: u32) f32 {
     return sample;
 }
 
-fn sampleFromF32(format: pa.sample_format_t, value: f32) std.BoundedArray(u8, 4) {
-    var result: std.BoundedArray(u8, 4) = undefined;
+const Sample = struct {
+    buffer: [4]u8,
+    len: usize,
+    pub fn slice(sample: *const Sample) []const u8 {
+        return sample.buffer[0..sample.len];
+    }
+};
+
+fn sampleFromF32(format: pa.sample_format_t, value: f32) Sample {
+    var result: Sample = undefined;
     return switch (format) {
         .S16LE => {
             result.len = 2;
